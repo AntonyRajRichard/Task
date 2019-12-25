@@ -1,6 +1,7 @@
 const body = document.getElementById('main');
 const todoList = [];
 var deletedList = null;
+let address = 0;
 const newElement = (element) => {
     return document.createElement(element);
 }
@@ -37,18 +38,42 @@ const tableRow = newElement('tr');
 const selectHeader = newElement('th');
 const TodoHeader = newElement('th');
 const deleteHeader = newElement('th');
-selectHeader.appendChild(newText('Select'));
+// selectHeader.appendChild(newText('Select'));
 TodoHeader.appendChild(newText('LIST TODO'));
-deleteHeader.appendChild(newText('Delete'));
+// deleteHeader.appendChild(newText('Delete'));
 table.appendChild(tableRow);
-tableRow.appendChild(selectHeader);
+// tableRow.appendChild(selectHeader);
 tableRow.appendChild(TodoHeader);
-tableRow.appendChild(deleteHeader);
+// tableRow.appendChild(deleteHeader);
 body.appendChild(table);
+const div = newElement('div');
+table.appendChild(div);
 
 const undoHandler = () => {
-    console.log(deletedList);
-    table.appendChild(deletedList);
+    // console.log(deletedList);
+    // table.appendChild(deletedList);
+    while (div.hasChildNodes()) {
+        div.removeChild(div.firstChild);
+    }
+    todoList.forEach(todo => {
+        const td1 = newElement('td');
+        td1.appendChild(newCheckBox());
+        td1.setAttribute('id', address++);
+        const td2 = newElement('td');
+        td2.appendChild(newText(todo));
+        const td3 = newElement('td');
+        const deleteBtn = newElement('button');
+        deleteBtn.innerText = "Delete";
+        deleteBtn.disabled = true;
+        deleteBtn.onclick = deleteHandler;
+        deleteBtn.setAttribute('id', 'btn-delete');
+        td3.appendChild(deleteBtn);
+        const tr = newElement('tr');
+        tr.appendChild(td1);
+        tr.appendChild(td2);
+        tr.appendChild(td3);
+        div.appendChild(tr);
+    });
 }
 
 //Undo Button 
@@ -60,13 +85,19 @@ undoBtn.onclick = undoHandler;
 const tableData = newElement('td');
 
 const checked = event => {
-    const parent = event.target.parentNode.parentNode;
-    const [check, text, btn] = parent.childNodes;
-    text.style.textDecoration = 'line-through';
-    btn.childNodes[0].disabled = false;
-    btn.childNodes[0].style.backgroundColor = "seashell";
-    btn.childNodes[0].style.color = "red";
-    console.log(btn);
+    if (event.target.checked) {
+        const parent = event.target.parentNode.parentNode;
+        const [check, text, btn] = parent.childNodes;
+        text.style.textDecoration = 'line-through';
+        btn.childNodes[0].disabled = false;
+        btn.childNodes[0].style.backgroundColor = "seashell";
+        btn.childNodes[0].style.color = "red";
+    } else {
+        const parent = event.target.parentNode.parentNode;
+        const [check, text, btn] = parent.childNodes;
+        text.style.textDecoration = 'none';
+        btn.childNodes[0].disabled = true;
+    }
 }
 
 // Checkbox hello
@@ -95,6 +126,7 @@ btn.addEventListener('click', () => {
     todoList.push(inputFeild.value);
     const td1 = newElement('td');
     td1.appendChild(newCheckBox());
+    td1.setAttribute('id', address++);
     const td2 = newElement('td');
     td2.appendChild(newText(inputFeild.value));
     const td3 = newElement('td');
@@ -108,6 +140,6 @@ btn.addEventListener('click', () => {
     tr.appendChild(td1);
     tr.appendChild(td2);
     tr.appendChild(td3);
-    table.appendChild(tr);
-    todoInput.innerText = '';
+    div.appendChild(tr);
+    inputFeild.value = '';
 });
